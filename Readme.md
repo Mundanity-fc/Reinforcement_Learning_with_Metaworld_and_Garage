@@ -10,7 +10,7 @@ Note 1: During the installation of mujoco-py, pip may throw an error of 'the dir
 
 Note 2: When using Linux Platform, mujoco-py will throw an error of 'ImportError: /path/to/conda/lib/libstdc++.so.6: version 'GLIBCXX_3.4.30' not found (required by /usr/lib/libOSMesa.so.8)', this is because the library installed on the OS is newer than the library used in conda environment. Try to overwrite `libstdc++.so.6.0.*` in conda envs with the newer one in OS, and create a link to it(`libstdc++.so.6` ---> `libstdc++.so.6.0.*`)
 
-This Repo has benn tested under Windows 11 (22H2) and Arch Linux (Kernel Zen-5.19.*)
+This Repo has benn tested under Windows 11 (22H2) and Arch Linux (Kernel Zen-5.19.*) with Python 3.9
 
 ---
 
@@ -24,4 +24,4 @@ This Repo has benn tested under Windows 11 (22H2) and Arch Linux (Kernel Zen-5.1
 
 注意 2：在 Linux 平台下，在进行 mujoco 编译的过程中可能会提示错误'ImportError: /path/to/conda/lib/libstdc++.so.6: version 'GLIBCXX_3.4.30' not found (required by /usr/lib/libOSMesa.so.8)'，这是由于系统安装的其他库文件依赖于系统中的`libstdc++.so`，而系统中该文件版本与 conda 环境中的库版本不一致。可以通过`strings /path/to/lib.so | grep GLIBCXX`来查看文件是否支持指定的内容。解决方法有多种，一种是将系统的库文件路径写入环境变量，另一种是直接用系统的库文件覆盖掉 conda 环境中的`libstdc++.so.6.0.*`文件，同时在相同路径下建立`libstdc++.so.6`到该文件的连接
 
-该仓库的内容均在 Windows 11（版本22H2）与 Arch Linux（内核Zen-5.19.*）下进行过测试
+该仓库的内容均在 Windows 11（版本22H2）与 Arch Linux（内核Zen-5.19.*）下进行过测试，测试环境采用 Python 3.9
