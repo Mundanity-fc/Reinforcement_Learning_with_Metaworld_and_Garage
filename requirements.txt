@@ -1,0 +1,3 @@
+git+https://github.com/rlworkgroup/metaworld.git@master#egg=metaworld
+garage
+mujoco_py==1.50.1.68
