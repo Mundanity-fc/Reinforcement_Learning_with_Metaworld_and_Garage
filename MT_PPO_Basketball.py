@@ -5,8 +5,8 @@ import tensorflow as tf
 from garage import wrap_experiment
 from garage.envs import normalize
 from garage.envs.multi_env_wrapper import MultiEnvWrapper, round_robin_strategy
-from garage.experiment import MetaWorldTaskSampler
 from garage.experiment.deterministic import set_seed
+from garage.experiment.task_sampler import MetaWorldTaskSampler
 from garage.np.baselines import LinearMultiFeatureBaseline
 from garage.sampler import LocalSampler
 from garage.tf.algos import TEPPO
@@ -18,27 +18,25 @@ from garage.trainer import TFTrainer
 
 @click.command()
 @click.option('--seed', default=1)
-@click.option('--n_epochs', default=600)
-@click.option('--batch_size_per_task', default=1024)
-@click.option('--n_tasks', default=10)
+@click.option('--n_epochs', default=200)
+@click.option('--batch_size_per_task', default=64)
 @wrap_experiment
-def ml1_ppo(ctxt, seed, n_epochs, batch_size_per_task, n_tasks):
+def MT_PPO_Basketball(ctxt, seed, n_epochs, batch_size_per_task):
     set_seed(seed)
-    ml1 = metaworld.ML1('pick-place-v2')
-    train_task_sampler = MetaWorldTaskSampler(ml1,
-                                              'train',
-                                              lambda env, _: normalize(env),
-                                              add_env_onehot=False)
-    assert n_tasks % 10 == 0
-    assert n_tasks <= 500
-    envs = [env_up() for env_up in train_task_sampler.sample(n_tasks)]
+    n_tasks = 2
+    mt1 = metaworld.MT1('basketball-v2')
+    task_sampler = MetaWorldTaskSampler(mt1,
+                                        'train',
+                                        lambda env, _: normalize(env),
+                                        add_env_onehot=False)
+    envs = [env_up() for env_up in task_sampler.sample(n_tasks)]
     env = MultiEnvWrapper(envs,
                           sample_strategy=round_robin_strategy,
                           mode='vanilla')
 
     latent_length = 4
     inference_window = 6
-    batch_size = batch_size_per_task * len(envs)
+    batch_size = batch_size_per_task * n_tasks
     policy_ent_coeff = 2e-2
     encoder_ent_coeff = 2e-4
     inference_ce_coeff = 5e-2
@@ -50,7 +48,6 @@ def ml1_ppo(ctxt, seed, n_epochs, batch_size_per_task, n_tasks):
     policy_min_std = None
 
     with TFTrainer(snapshot_config=ctxt) as trainer:
-
         task_embed_spec = TEPPO.get_encoder_spec(env.task_space,
                                                  latent_dim=latent_length)
 
@@ -127,4 +124,4 @@ def ml1_ppo(ctxt, seed, n_epochs, batch_size_per_task, n_tasks):
         trainer.train(n_epochs=n_epochs, batch_size=batch_size, plot=False)
 
 
-ml1_ppo()
+MT_PPO_Basketball()
