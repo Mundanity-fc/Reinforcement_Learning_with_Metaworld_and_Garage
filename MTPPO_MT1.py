@@ -19,12 +19,12 @@ from garage.trainer import TFTrainer
 @click.command()
 @click.option('--seed', default=1)
 @click.option('--n_epochs', default=200)
-@click.option('--batch_size_per_task', default=64)
+@click.option('--batch_size_per_task', default=1024)
 @wrap_experiment
-def MT_PPO_Basketball(ctxt, seed, n_epochs, batch_size_per_task):
+def MTPPO_MT1(ctxt, seed, n_epochs, batch_size_per_task):
     set_seed(seed)
-    n_tasks = 2
-    mt1 = metaworld.MT1('basketball-v2')
+    n_tasks = 50
+    mt1 = metaworld.MT1('assembly-v2')
     task_sampler = MetaWorldTaskSampler(mt1,
                                         'train',
                                         lambda env, _: normalize(env),
@@ -34,7 +34,7 @@ def MT_PPO_Basketball(ctxt, seed, n_epochs, batch_size_per_task):
                           sample_strategy=round_robin_strategy,
                           mode='vanilla')
 
-    latent_length = 4
+    latent_length = 2
     inference_window = 6
     batch_size = batch_size_per_task * n_tasks
     policy_ent_coeff = 2e-2
@@ -124,4 +124,4 @@ def MT_PPO_Basketball(ctxt, seed, n_epochs, batch_size_per_task):
         trainer.train(n_epochs=n_epochs, batch_size=batch_size, plot=False)
 
 
-MT_PPO_Basketball()
+MTPPO_MT1()
