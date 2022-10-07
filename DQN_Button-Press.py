@@ -10,7 +10,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 import wandb
 from DQN import DQN_Agent, ReplayBuffer
-from utils import evaluate_policy, str2bool
+from utils.DQN_Tools import evaluate_policy, str2bool
 
 '''Hyperparameter Setting'''
 parser = argparse.ArgumentParser()
@@ -64,7 +64,7 @@ def transform_reward(r):
 
 
 def main():
-    wandb.init(project="ddqn-metaworld", entity="fgossi", settings=wandb.Settings(start_method="fork"))
+    #wandb.init(project="ddqn-metaworld", entity="fgossi", settings=wandb.Settings(start_method="fork"))
     # EnvName = ['CartPole-v1','LunarLander-v2']
     # BriefEnvName = ['CPV1', 'LLdV2']
     # Env_With_DW = [True, True] #DW: Die or Win
@@ -72,13 +72,13 @@ def main():
     # env_with_dw = Env_With_DW[EnvIdex]
     env_with_dw = False
     # env = gym.make(EnvName[EnvIdex])
-    mt1 = metaworld.MT1('button-press-v2')  # Construct the benchmark, sampling tasks
-    env = mt1.train_classes['button-press-v2']()  # Create an environment with task `pick_place`
+    mt1 = metaworld.MT1('basketball-v2')  # Construct the benchmark, sampling tasks
+    env = mt1.train_classes['basketball-v2']()  # Create an environment with task `pick_place`
     task = mt1.train_tasks[1]
     env.set_task(task)  # Set task
     env._last_rand_vec[0] = -0.09  # -0.09 or 0.07
     env._last_rand_vec[1] = 0.86  # 0.86 or 0.89
-    wandb.log({"goalX": env._last_rand_vec[0], "goalY": env._last_rand_vec[1]})
+    #wandb.log({"goalX": env._last_rand_vec[0], "goalY": env._last_rand_vec[1]})
     # eval_env = gym.make(EnvName[EnvIdex])
     eval_env = env
     state_dim = 6
@@ -128,8 +128,8 @@ def main():
     minS = np.ones(state_dim) * 10
     maxS = np.ones(state_dim) * (-10)
 
-    wandb.watch(model.q_net, log_freq=10000)
-    wandb.watch(model.q_target, log_freq=10000)
+    #wandb.watch(model.q_net, log_freq=10000)
+    #wandb.watch(model.q_target, log_freq=10000)
 
     print(str(kwargs['batch_size']))
 
@@ -187,7 +187,7 @@ def main():
                         writer.add_scalar('noise', model.exp_noise, global_step=total_steps)
                     print('EnvName:', 'metaworld', 'seed:', seed, 'steps: {}k'.format(int(total_steps / 1000)),
                           'score:', score)
-                    wandb.log({"reward": score, "step": total_steps, "pos_eps": positive_eps})
+                    #wandb.log({"reward": score, "step": total_steps, "pos_eps": positive_eps})
                 total_steps += 1
 
                 '''save model'''
