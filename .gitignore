@@ -1,2 +1,6 @@
 test.py
 data/
+model/
+runs/
+src/
+wandb/
