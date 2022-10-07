@@ -51,6 +51,7 @@ def MTSAC_MT1(ctxt=None, *, seed, timesteps, _gpu):
     n_tasks = 50
     train_envs = train_task_sampler.sample(n_tasks)
     env = train_envs[0]()
+    # env.visualize()
     test_envs = [env_up() for env_up in test_task_sampler.sample(n_tasks)]
 
     trainer = Trainer(ctxt)

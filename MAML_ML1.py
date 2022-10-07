@@ -42,6 +42,7 @@ def MAML_ML1(ctxt, seed, epochs, rollouts_per_task,
     ml1 = metaworld.ML1('button-press-v2')
     tasks = MetaWorldTaskSampler(ml1, 'train')
     env = tasks.sample(1)[0]()
+    # env.visualize()
     test_sampler = SetTaskSampler(MetaWorldSetTaskEnv,
                                   env=MetaWorldSetTaskEnv(ml1, 'test'))
 
@@ -78,8 +79,8 @@ def MAML_ML1(ctxt, seed, epochs, rollouts_per_task,
                     inner_lr=0.1,
                     num_grad_updates=1,
                     meta_evaluator=meta_evaluator)
-
     trainer.setup(algo, env)
+
     trainer.train(n_epochs=epochs,
                   batch_size=rollouts_per_task * env.spec.max_episode_length)
 

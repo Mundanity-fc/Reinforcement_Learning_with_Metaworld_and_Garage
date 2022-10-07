@@ -43,7 +43,7 @@ def MTTRPO_MT1(ctxt, seed, epochs, batch_size):
     env = MultiEnvWrapper(envs,
                           sample_strategy=round_robin_strategy,
                           mode='vanilla')
-
+    # env.visualize()
     policy = GaussianMLPPolicy(
         env_spec=env.spec,
         hidden_sizes=(64, 64),

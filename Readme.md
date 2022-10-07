@@ -10,6 +10,8 @@ Note 1: During the installation of mujoco-py, pip may throw an error of 'the dir
 
 Note 2: When using Linux Platform, mujoco-py will throw an error of 'ImportError: /path/to/conda/lib/libstdc++.so.6: version 'GLIBCXX_3.4.30' not found (required by /usr/lib/libOSMesa.so.8)', this is because the library installed on the OS is newer than the library used in conda environment. Try to overwrite `libstdc++.so.6.0.*` in conda envs with the newer one in OS, and create a link to it(`libstdc++.so.6` ---> `libstdc++.so.6.0.*`)
 
+Note 3: When using metaworld envs, if users try to use `env.visualize()` python will throw an error of `TypeError: render() got an unexpected keyword argument 'mode'`. Goto garage package and edit `garage/envs/gym_env.py` file. Replace `self._env.render(mode='human')` in line 288 with `self._env.render()`
+
 This Repo has benn tested under Windows 11 (22H2) and Arch Linux (Kernel Zen-5.19.*) with Python 3.9
 
 ---
@@ -23,5 +25,7 @@ This Repo has benn tested under Windows 11 (22H2) and Arch Linux (Kernel Zen-5.1
 注意 1：在安装 mujoco-py 的过程中，pip 可能会提示文件名或路径过长的报错，该错误可能由于 pip 过程中的缓存文件使用的哈希值导致路径过长而引起的。当遇到相同情况时，请直接将 mujoco-py 的源码复制进 Python 环境的 Libs 文件夹中
 
 注意 2：在 Linux 平台下，在进行 mujoco 编译的过程中可能会提示错误'ImportError: /path/to/conda/lib/libstdc++.so.6: version 'GLIBCXX_3.4.30' not found (required by /usr/lib/libOSMesa.so.8)'，这是由于系统安装的其他库文件依赖于系统中的`libstdc++.so`，而系统中该文件版本与 conda 环境中的库版本不一致。可以通过`strings /path/to/lib.so | grep GLIBCXX`来查看文件是否支持指定的内容。解决方法有多种，一种是将系统的库文件路径写入环境变量，另一种是直接用系统的库文件覆盖掉 conda 环境中的`libstdc++.so.6.0.*`文件，同时在相同路径下建立`libstdc++.so.6`到该文件的连接
+
+注意 3: 使用 metaworld 环境时, 如果尝试使用 `env.visualize()` python 提示错误：`TypeError: render() got an unexpected keyword argument 'mode'`. 进入 garage 包目录，并修改文件： `garage/envs/gym_env.py`。 将第288行的 `self._env.render(mode='human')`替换为`self._env.render()`
 
 该仓库的内容均在 Windows 11（版本22H2）与 Arch Linux（内核Zen-5.19.*）下进行过测试，测试环境采用 Python 3.9

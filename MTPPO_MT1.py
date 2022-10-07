@@ -33,7 +33,7 @@ def MTPPO_MT1(ctxt, seed, n_epochs, batch_size_per_task):
     env = MultiEnvWrapper(envs,
                           sample_strategy=round_robin_strategy,
                           mode='vanilla')
-
+    # env.visualize()
     latent_length = 2
     inference_window = 6
     batch_size = batch_size_per_task * n_tasks
