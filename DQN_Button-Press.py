@@ -72,8 +72,8 @@ def main():
     # env_with_dw = Env_With_DW[EnvIdex]
     env_with_dw = False
     # env = gym.make(EnvName[EnvIdex])
-    mt1 = metaworld.MT1('basketball-v2')  # Construct the benchmark, sampling tasks
-    env = mt1.train_classes['basketball-v2']()  # Create an environment with task `pick_place`
+    mt1 = metaworld.MT1('button_press-v2')  # Construct the benchmark, sampling tasks
+    env = mt1.train_classes['button_press-v2']()  # Create an environment with task `pick_place`
     task = mt1.train_tasks[1]
     env.set_task(task)  # Set task
     env._last_rand_vec[0] = -0.09  # -0.09 or 0.07
