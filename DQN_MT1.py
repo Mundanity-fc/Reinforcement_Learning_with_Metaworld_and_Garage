@@ -40,51 +40,35 @@ print(opt)
 
 def action2box(action):
     box = np.zeros(4)
-    # print("action2:",action)
     for i in range(4):
         box[i] = (action % 5) / 2 - 1
         action = action // 5
-    # print("2box:",box)
     return box
 
 
 def box2action(box):
-    # print("box2:",box)
     a = 0
     for i in range(4):
         a += (round(box[i]) + 1) * 2 * (5 ** i)
-    # print("2action:",a)
-    # print("origbox:",box,"a2b:",action2box(a))
     return a
 
 
 def transform_reward(r):
-    # return max(0,np.log2(r+200))
     return r
 
 
 def main():
-    #wandb.init(project="ddqn-metaworld", entity="fgossi", settings=wandb.Settings(start_method="fork"))
-    # EnvName = ['CartPole-v1','LunarLander-v2']
-    # BriefEnvName = ['CPV1', 'LLdV2']
-    # Env_With_DW = [True, True] #DW: Die or Win
-    # EnvIdex = opt.EnvIdex
-    # env_with_dw = Env_With_DW[EnvIdex]
     env_with_dw = False
-    # env = gym.make(EnvName[EnvIdex])
-    mt1 = metaworld.MT1('button-press-v2')  # Construct the benchmark, sampling tasks
-    env = mt1.train_classes['button-press-v2']()  # Create an environment with task `pick_place`
+    mt1 = metaworld.MT1('button-press-v2')
+    env = mt1.train_classes['button-press-v2']()
     task = mt1.train_tasks[1]
-    env.set_task(task)  # Set task
-    env._last_rand_vec[0] = -0.09  # -0.09 or 0.07
-    env._last_rand_vec[1] = 0.86  # 0.86 or 0.89
-    #wandb.log({"goalX": env._last_rand_vec[0], "goalY": env._last_rand_vec[1]})
-    # eval_env = gym.make(EnvName[EnvIdex])
+    env.set_task(task)
+    env._last_rand_vec[0] = -0.09
+    env._last_rand_vec[1] = 0.86
     eval_env = env
     state_dim = 6
     action_dim = 625
 
-    # Use DDQN or DQN
     if opt.DDQN:
         algo_name = 'DDQN'
     else:
@@ -128,8 +112,6 @@ def main():
     minS = np.ones(state_dim) * 10
     maxS = np.ones(state_dim) * (-10)
 
-    #wandb.watch(model.q_net, log_freq=10000)
-    #wandb.watch(model.q_target, log_freq=10000)
 
     print(str(kwargs['batch_size']))
 
@@ -149,8 +131,7 @@ def main():
 
             while env.curr_path_length < env.max_path_length:
                 env.render()
-                # print("step:", steps, env.curr_path_length)
-                steps += 1  # steps in current episode
+                steps += 1
                 if buffer.size < opt.random_steps:
                     a = env.action_space.sample()
                 else:
@@ -162,7 +143,6 @@ def main():
                 minS = np.minimum(s_prime, minS)
                 maxS = np.maximum(s_prime, maxS)
 
-                '''Avoid impacts caused by reaching max episode steps'''
                 if (done and steps != max_e_steps):
                     dw = True  # dw: dead and win
                 else:
@@ -171,14 +151,11 @@ def main():
                 buffer.add(s, box2action(a), r, s_prime, dw)
                 s = s_prime
                 ep_r += r
-
-                '''update if its time'''
-                # train 50 times every 50 steps rather than 1 training per step. Better!
+                
                 if total_steps >= opt.random_steps and total_steps % opt.update_every == 0:
                     for j in range(opt.update_every):
                         model.train(buffer)
 
-                '''record & log'''
                 if (total_steps) % opt.eval_interval == 0:
                     model.exp_noise *= opt.noise_decay
                     score, positive_eps = evaluate_policy(eval_env, model, render=False, state_dim=state_dim)
@@ -187,15 +164,13 @@ def main():
                         writer.add_scalar('noise', model.exp_noise, global_step=total_steps)
                     print('EnvName:', 'metaworld', 'seed:', seed, 'steps: {}k'.format(int(total_steps / 1000)),
                           'score:', score)
-                    #wandb.log({"reward": score, "step": total_steps, "pos_eps": positive_eps})
+
                 total_steps += 1
 
-                '''save model'''
                 if (total_steps) % opt.save_interval == 0:
                     model.save(algo_name, 'metaworld' + '_bs' + str(kwargs['batch_size']) + 'gamma' + str(
                         opt.gamma) + 'nDec' + str(opt.noise_decay), total_steps)
 
-                '''print minS, maxS'''
                 if (total_steps) % 10000 == 0:
                     print("minS", minS, "\nmaxS", maxS)
     env.close()
