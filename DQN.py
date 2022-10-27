@@ -71,7 +71,6 @@ class DQN_Agent(object):
     def train(self, replay_buffer):
         s, a, r, s_prime, dw_mask = replay_buffer.sample(self.batch_size)
 
-        '''Compute the target Q value'''
         with torch.no_grad():
             if self.double_dqn:
                 argmax_a = self.q_net(s_prime).argmax(dim=1).unsqueeze(-1)
@@ -79,9 +78,8 @@ class DQN_Agent(object):
             else:
                 max_q_prime = self.q_target(s_prime).max(1)[0].unsqueeze(1)
 
-            '''Avoid impacts caused by reaching max episode steps'''
             if self.env_with_dw:
-                target_Q = r + (1 - dw_mask) * self.gamma * max_q_prime  # dw: die or win
+                target_Q = r + (1 - dw_mask) * self.gamma * max_q_prime
             else:
                 target_Q = r + self.gamma * max_q_prime
 
