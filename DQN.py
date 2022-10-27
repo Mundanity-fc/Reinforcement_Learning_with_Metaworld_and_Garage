@@ -9,7 +9,6 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def build_net(layer_shape, activation, output_activation):
-    '''build net with for loop'''
     layers = []
     for j in range(len(layer_shape) - 1):
         act = activation if j < len(layer_shape) - 2 else output_activation
@@ -45,7 +44,7 @@ class DQN_Agent(object):
         self.q_net = Q_Net(state_dim, action_dim, hid_shape).to(device)
         self.q_net_optimizer = torch.optim.Adam(self.q_net.parameters(), lr=lr)
         self.q_target = copy.deepcopy(self.q_net)
-        # Freeze target networks with respect to optimizers (only update via polyak averaging)
+
         for p in self.q_target.parameters():
             p.requires_grad = False
 
@@ -57,18 +56,16 @@ class DQN_Agent(object):
         self.action_dim = action_dim
         self.double_dqn = double_dqn
 
-    def select_action(self, state, deterministic):  # only used when interact with the env
+    def select_action(self, state, deterministic):
         with torch.no_grad():
             state = torch.FloatTensor(state.reshape(1, -1)).to(device)
             if deterministic:
                 a = self.q_net(state).argmax().item()
             else:
-                # if np.random.rand() < self.exp_noise + 0.05:
                 if np.random.rand() < self.exp_noise:
                     a = np.random.randint(0, self.action_dim)
                 else:
                     a = self.q_net(state).argmax().item()
-        # print("action:", a)
         return a
 
     def train(self, replay_buffer):
@@ -88,7 +85,6 @@ class DQN_Agent(object):
             else:
                 target_Q = r + self.gamma * max_q_prime
 
-        # Get current Q estimates
         current_q = self.q_net(s)
         current_q_a = current_q.gather(1, a)
 
@@ -97,7 +93,6 @@ class DQN_Agent(object):
         q_loss.backward()
         self.q_net_optimizer.step()
 
-        # Update the frozen target models
         for param, target_param in zip(self.q_net.parameters(), self.q_target.parameters()):
             target_param.data.copy_(self.tau * param.data + (1 - self.tau) * target_param.data)
 
@@ -129,7 +124,7 @@ class ReplayBuffer(object):
         self.action[self.ptr] = action
         self.reward[self.ptr] = reward
         self.next_state[self.ptr] = next_state
-        self.dw[self.ptr] = dw  # 0,0,0，...，1
+        self.dw[self.ptr] = dw
 
         self.ptr = (self.ptr + 1) % self.max_size
         self.size = min(self.size + 1, self.max_size)
